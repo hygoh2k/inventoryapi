@@ -21,7 +21,12 @@ namespace InventoryWebapi
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            config.Properties["repo"] = new AssetRepo();
+            config.Routes.MapHttpRoute(
+                name: "AssetController", 
+                routeTemplate: "api/{controller}/{id}/{AssetHolder}"
+
+            );
+
         }
     }
 }

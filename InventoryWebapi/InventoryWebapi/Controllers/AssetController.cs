@@ -14,7 +14,7 @@ namespace InventoryWebapi.Controllers
 
         public AssetController()
         {
-            
+            _repo = AssetRepo.Instance;
         }
         // GET: api/Asset
         public IHttpActionResult Get()
@@ -44,12 +44,47 @@ namespace InventoryWebapi.Controllers
 
             var newAsset = _repo.CreateAndAdd(value);
 
+            if(newAsset == null)
+            {
+                return BadRequest("Something Wrong");
+            }
+
             return Ok(newAsset);
         }
 
         // PUT: api/Asset/5
-        public void Put(int id, [FromBody]string AssetOwner)
+        public IHttpActionResult Put(int id, [FromBody]Asset assetInfo)
         {
+            if(_repo.Asset.Any(x => x.Id == id) == false)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var updated = _repo.Update(id, assetInfo, false);
+                if (updated == null)
+                    return BadRequest("Unknown error");
+
+                return Ok(new { result = updated });
+            }
+            
+        }
+
+        public IHttpActionResult Patch(int id, [FromBody]object AssetHolder)
+        {
+            if (_repo.Asset.Any(x => x.Id == id) == false)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var updated = _repo.Update(id, new Asset() { LastClaimed = AssetHolder.ToString() }, true);
+                if (updated == null)
+                    return BadRequest("Unknown error");
+
+                return Ok(new { result = updated });
+            }
+
         }
 
         // DELETE: api/Asset/5
